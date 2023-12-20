@@ -13,7 +13,7 @@ from pathlib import Path
 
 class Game:
 
-    def __init__(self):
+    def __init__(self, play=False):
         self.gameMain = pygame
         self.game_end = False
         self.score = 0
@@ -28,6 +28,8 @@ class Game:
         self.draw_board()
         self.draw_pieces(self.current_board)
         self.direction = ''
+        if play:
+            self.history.add_grid_state(self.to_string(), self.score)
 
         #
         # while not game_window.game.game_end:
@@ -73,7 +75,9 @@ class Game:
                     if (col < len(board[row]) - 1 and board[row][col + 1] == board[row][col]) \
                             or (row < len(board) - 1 and board[row + 1][col] == board[row][col]):
                         return board, game_end
+
         game_end = True
+
         return board, game_end
 
     def is_winning(self):
@@ -241,7 +245,7 @@ class Game:
         self.move(direction, self.current_board)
         # self.score += self.grid.merge(direction)
         # self.grid.move_tiles(direction)
-        self.move(direction, self.current_board)
+        # self.move(direction, self.current_board)
         if self.history.something_moved(self.to_string()):
             self.history.add_direction_or_state(direction, index_choice)
             print("Next direction to be played: {}".format(direction.value))
@@ -250,7 +254,6 @@ class Game:
             # self.grid.generate_new_number(self.grid.return_free_positions())
             self.history.add_grid_state(self.to_string(), self.score)
             print(self.__repr__())
-            # self.check_win_or_loose()
             return True
         else:
             return False

@@ -18,7 +18,7 @@ class Window:
         self.gameView.place(x=-1, y=-1)
         self.window_after_id = None
 
-        self.game = Game()
+        self.game = Game(True)
         # self.window.bind('<KeyPress>', self.handle_key_press)
 
         self.score_label = tk.Label(self.window, text=f"Score: {self.game.score}", font=(TK_FONT, TK_FONT_SIZE, "bold"), padx=10)
@@ -28,8 +28,8 @@ class Window:
                                 font=(TK_FONT, TK_FONT_SIZE, "bold"), padx=10)
         self.result_label.place(x=-100, y=-100)
 
-        self.decision = tk.Label(self.window, text=f"Next move: ", font=(TK_FONT, TK_FONT_SIZE, "bold"), padx=10)
-        self.decision.place(x=0, y=460)
+        # self.decision = tk.Label(self.window, text=f"Next move: ", font=(TK_FONT, TK_FONT_SIZE, "bold"), padx=10)
+        # self.decision.place(x=0, y=460)
 
         self.nn = NeuralNetwork()
         self.nn.add_layer(Layer(16, 4))
@@ -61,10 +61,10 @@ class Window:
             x = np.array(np.mat(self.game.to_string()))
             predictions = self.nn.predict(x)
             self.game.play_many_directions(predictions)
-            self.game.save_game(base_path=self.replay_dir)
         elif self.game.game_end:
             self.result_label.place(x=125, y=150)
             self.stop_game()
+            self.game.save_game(base_path=self.replay_dir)
 
 
     # def handle_key_press(self, event):

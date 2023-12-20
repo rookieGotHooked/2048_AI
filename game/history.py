@@ -36,6 +36,7 @@ class History:
             str_to_return += "{} ".format(i)
             str_to_return += "{} ".format(self.score_history[i])
             str_to_return += str(self.grid_history[i])
+            print(self.direction_state_history)
             str_to_return += " {}".format(self.direction_state_history[i].value)
             str_to_return += " [{}]".format(self.direction_index_history[i])
             str_to_return += "\n"
