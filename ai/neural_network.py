@@ -4,9 +4,20 @@ import numpy as np
 from params import Directions, TARGET
 from game.game import Game
 
-NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.75, 'Left': 0.5, 'Right': 0.25}
-DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
-DIRECTION_VALUES_LIST = [1.0, 0.75, 0.5, 0.25]
+# Sigmoid
+# NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.75, 'Left': 0.5, 'Right': 0.25}
+# DIRECTION_VALUES_LIST = [1.0, 0.75, 0.5, 0.25]
+# DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
+
+# Tanh
+# NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.5, 'Left': 0.0, 'Right': -0.5}
+# DIRECTION_VALUES_LIST = [1.0, 0.5, 0.0, -0.5]
+# DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
+
+# ReLU
+# NORMALIZED_DIR_DICT = {'Up': 10.0, 'Down': 7.5, 'Left': 5.0, 'Right': 2.5}
+# DIRECTION_VALUES_LIST = [10.0, 7.5, 5.0, 2.5]
+# DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
 
 
 class NeuralNetwork:
@@ -14,8 +25,24 @@ class NeuralNetwork:
     Represents a neural network
     """
 
-    def __init__(self):
+    def __init__(self, function="tanh"):
         self._layers = []
+        self.function = function
+
+        if function == "sigmoid":
+            self.NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.75, 'Left': 0.5, 'Right': 0.25}
+            self.DIRECTION_VALUES_LIST = [1.0, 0.75, 0.5, 0.25]
+            self.DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
+
+        elif function == "tanh":
+            self.NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.5, 'Left': 0.0, 'Right': -0.5}
+            self.DIRECTION_VALUES_LIST = [1.0, 0.5, 0.0, -0.5]
+            self.DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
+
+        else:
+            self.NORMALIZED_DIR_DICT = {'Up': 10.0, 'Down': 7.5, 'Left': 5.0, 'Right': 2.5}
+            self.DIRECTION_VALUES_LIST = [10.0, 7.5, 5.0, 2.5]
+            self.DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
 
     def add_layer(self, layer):
         """
@@ -37,7 +64,7 @@ class NeuralNetwork:
         @rtype X: np.array
         """
         for layer in self._layers:
-            x = layer.activate(x)
+            x = layer.activate(x, self.function)
         return x
 
     def predict(self, x):
@@ -51,11 +78,11 @@ class NeuralNetwork:
         @rtype: list of Constants.Directions
         """
         ff = self.feed_forward(x)
-        output_error_vector = np.power(np.subtract(np.array(DIRECTION_VALUES_LIST), ff), 2)
+        output_error_vector = np.power(np.subtract(np.array(self.DIRECTION_VALUES_LIST), ff), 2)
         direction_vector_choices = np.argsort(output_error_vector)
         choices_to_return = list()
         for index in np.nditer(direction_vector_choices):
-            choices_to_return.append(DIRECTIONS_LIST[int(index)])
+            choices_to_return.append(self.DIRECTIONS_LIST[int(index)])
 
         print('Result after predictions:')
         for choice in choices_to_return:
@@ -86,11 +113,11 @@ class NeuralNetwork:
             if layer == self._layers[-1]:
                 layer.error = y - output
                 # The output = layer.last_activation in this case
-                layer.delta = layer.error * layer.apply_activation_derivative(output)
+                layer.delta = layer.error * layer.apply_activation_derivative(output, self.function)
             else:
                 next_layer = self._layers[i + 1]
                 layer.error = np.dot(next_layer.weights, next_layer.delta)
-                layer.delta = layer.error * layer.apply_activation_derivative(layer.last_activation)
+                layer.delta = layer.error * layer.apply_activation_derivative(layer.last_activation, self.function)
 
         # Update the weights
         for i in range(len(self._layers)):
@@ -156,8 +183,8 @@ class NeuralNetwork:
                 print("NOK - File not parsed: {}".format(os.path.join(directory, filename)))
         self.train(all_x, all_y, learning_rate, max_epochs)
 
-    @staticmethod
-    def parse_inputs_outputs_for_neural_net(game):
+    # @staticmethod
+    def parse_inputs_outputs_for_neural_net(self, game):
         """
         Helper methode to convert a 2048 log file into a list of (x,y) to train the neural network
 
@@ -173,5 +200,5 @@ class NeuralNetwork:
         for i in range(len(game.history.grid_history)):
             if game.history.direction_state_history[i] in ['Up', 'Down', 'Left', 'Right']:
                 x[i, :] = [float(num) / TARGET for num in game.history.grid_history[i].strip().split(' ')]
-                y[i, :] = [NORMALIZED_DIR_DICT[game.history.direction_state_history[i]]]
+                y[i, :] = [self.NORMALIZED_DIR_DICT[game.history.direction_state_history[i]]]
         return x, y

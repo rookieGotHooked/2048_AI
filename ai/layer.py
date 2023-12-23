@@ -10,7 +10,7 @@ class Layer:
     Represents a layer (hidden or output) in our neural network
     """
 
-    def __init__(self, n_input, n_neurons, weights=None, bias=None):
+    def __init__(self, n_input, n_neurons, weights=None, bias=None, function="sigmoid"):
         """
         @param n_input: The input size (coming from the input layer or a previous hidden layer)
         @type n_input: int
@@ -27,9 +27,10 @@ class Layer:
         self.last_activation = None
         self.error = None
         self.delta = None
+        self.function = function
 
     @staticmethod
-    def apply_activation(r):
+    def apply_activation(r, function):
         """
         Applies the sigmoid activation function
 
@@ -39,10 +40,15 @@ class Layer:
         @return: The "activated" value
         @rtype: np.array
         """
-        return 1 / (1 + np.exp(-r))
+        if function == "sigmoid":
+            return 1 / (1 + np.exp(-r))
+        elif function == "tanh":
+            return np.tanh(r)
+        elif function == "relu":
+            return np.maximum(0, r)
 
     @staticmethod
-    def apply_activation_derivative(r):
+    def apply_activation_derivative(r, function):
         """
         Applies the derivative of the sigmoid activation function
 
@@ -54,9 +60,14 @@ class Layer:
         """
         # We use 'r' directly here because its already activated, the only values that
         # are used in this function are the last activations that were saved.
-        return r * (1 - r)
+        if function == "sigmoid":
+            return r * (1 - r)
+        elif function == "tanh":
+            return 1 - r ** 2
+        elif function == "relu":
+            return np.where(r > 0, 1, 0)
 
-    def activate(self, x):
+    def activate(self, x, function):
         """
         Calculates the dot product of this layer.
 
@@ -67,5 +78,5 @@ class Layer:
         @rtype: np.array
         """
         r = np.dot(x, self.weights) + self.bias
-        self.last_activation = self.apply_activation(r)
+        self.last_activation = self.apply_activation(r, function)
         return self.last_activation

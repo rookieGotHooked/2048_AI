@@ -31,7 +31,27 @@ class Window:
         # self.decision = tk.Label(self.window, text=f"Next move: ", font=(TK_FONT, TK_FONT_SIZE, "bold"), padx=10)
         # self.decision.place(x=0, y=460)
 
-        self.nn = NeuralNetwork()
+        self.nn = NeuralNetwork("relu")
+        # self.nn.add_layer(Layer(16, 4))
+        # self.nn.add_layer(Layer(4, 4))
+        # self.nn.add_layer(Layer(4, 2))
+        # self.nn.add_layer(Layer(2, 16))
+        # self.nn.add_layer(Layer(16, 4))
+
+        # self.nn.add_layer(Layer(16, 16))
+        # self.nn.add_layer(Layer(16, 4))
+        # self.nn.add_layer(Layer(4, 2))
+        # self.nn.add_layer(Layer(2, 4))
+
+        # self.nn.add_layer(Layer(16, 2))
+        # self.nn.add_layer(Layer(2, 16))
+        # self.nn.add_layer(Layer(16, 1))
+        # self.nn.add_layer(Layer(1, 4))
+        # self.nn.add_layer(Layer(4, 4))
+
+        # self.nn.add_layer(Layer(16, 4))
+        # self.nn.add_layer(Layer(4, 4))
+
         self.nn.add_layer(Layer(16, 4))
         self.nn.add_layer(Layer(4, 4))
 
@@ -65,7 +85,6 @@ class Window:
             self.result_label.place(x=125, y=150)
             self.stop_game()
             self.game.save_game(base_path=self.replay_dir)
-
 
     # def handle_key_press(self, event):
     #     if event.keysym == 'Up':
