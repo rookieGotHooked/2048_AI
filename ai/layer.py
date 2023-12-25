@@ -10,7 +10,7 @@ class Layer:
     Represents a layer (hidden or output) in our neural network
     """
 
-    def __init__(self, n_input, n_neurons, weights=None, bias=None, function="sigmoid"):
+    def __init__(self, n_input, n_neurons, weights=None, bias=None, function="sigmoid", alpha=0.01):
         """
         @param n_input: The input size (coming from the input layer or a previous hidden layer)
         @type n_input: int
@@ -28,9 +28,10 @@ class Layer:
         self.error = None
         self.delta = None
         self.function = function
+        self.alpha = alpha
 
     @staticmethod
-    def apply_activation(r, function):
+    def apply_activation(r, function, alpha=0.01):
         """
         Applies the sigmoid activation function
 
@@ -46,9 +47,11 @@ class Layer:
             return np.tanh(r)
         elif function == "relu":
             return np.maximum(0, r)
+        elif function == "leaky_relu":
+            return np.maximum(alpha * r, r)
 
     @staticmethod
-    def apply_activation_derivative(r, function):
+    def apply_activation_derivative(r, function, alpha=0.01):
         """
         Applies the derivative of the sigmoid activation function
 
@@ -66,8 +69,10 @@ class Layer:
             return 1 - r ** 2
         elif function == "relu":
             return np.where(r > 0, 1, 0)
+        elif function == "leaky_relu":
+            return np.where(r > 0, 1, alpha)
 
-    def activate(self, x, function):
+    def activate(self, x, function, alpha=0.01):
         """
         Calculates the dot product of this layer.
 
@@ -78,5 +83,8 @@ class Layer:
         @rtype: np.array
         """
         r = np.dot(x, self.weights) + self.bias
-        self.last_activation = self.apply_activation(r, function)
+        if function == "leaky_relu":
+            self.last_activation = self.apply_activation(r, function, alpha)
+        else:
+            self.last_activation = self.apply_activation(r, function)
         return self.last_activation

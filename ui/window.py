@@ -10,7 +10,7 @@ from ai.layer import Layer
 from os import path
 
 class Window:
-    def __init__(self):
+    def __init__(self, function, alpha):
         self.window = tk.Tk()
         self.window.geometry(f"{GAME_VIEW_WIDTH}x{WINDOW_HEIGHT}")
 
@@ -28,32 +28,10 @@ class Window:
                                 font=(TK_FONT, TK_FONT_SIZE, "bold"), padx=10)
         self.result_label.place(x=-100, y=-100)
 
-        # self.decision = tk.Label(self.window, text=f"Next move: ", font=(TK_FONT, TK_FONT_SIZE, "bold"), padx=10)
-        # self.decision.place(x=0, y=460)
+        self.nn = NeuralNetwork(function, alpha)
 
-        self.nn = NeuralNetwork("relu")
-        # self.nn.add_layer(Layer(16, 4))
-        # self.nn.add_layer(Layer(4, 4))
-        # self.nn.add_layer(Layer(4, 2))
-        # self.nn.add_layer(Layer(2, 16))
-        # self.nn.add_layer(Layer(16, 4))
-
-        # self.nn.add_layer(Layer(16, 16))
-        # self.nn.add_layer(Layer(16, 4))
-        # self.nn.add_layer(Layer(4, 2))
-        # self.nn.add_layer(Layer(2, 4))
-
-        # self.nn.add_layer(Layer(16, 2))
-        # self.nn.add_layer(Layer(2, 16))
-        # self.nn.add_layer(Layer(16, 1))
-        # self.nn.add_layer(Layer(1, 4))
-        # self.nn.add_layer(Layer(4, 4))
-
-        # self.nn.add_layer(Layer(16, 4))
-        # self.nn.add_layer(Layer(4, 4))
-
-        self.nn.add_layer(Layer(16, 4))
-        self.nn.add_layer(Layer(4, 4))
+        self.nn.add_layer(Layer(16, 4, alpha=alpha))
+        self.nn.add_layer(Layer(4, 4, alpha=alpha))
 
         train_dir = path.join(DATA_DIR_NAME, TRAIN_DIR_NAME)
         self.nn.train_from_directory(directory=train_dir,
@@ -75,28 +53,16 @@ class Window:
 
         self.score_label.config(text=f"Score: {self.game.score}")
 
-        self.window_after_id = self.window.after(int(1000 / FPS), self.update)
-
         if not self.game.game_end:
             x = np.array(np.mat(self.game.to_string()))
-            predictions = self.nn.predict(x)
-            self.game.play_many_directions(predictions)
-        elif self.game.game_end:
+            prediction = self.nn.predict(x)
+            self.game.play_many_directions(prediction)
+            self.window_after_id = self.window.after(int(1000 / FPS), self.update)
+        else:
+            print(f"\nGame ended")
             self.result_label.place(x=125, y=150)
             self.stop_game()
             self.game.save_game(base_path=self.replay_dir)
-
-    # def handle_key_press(self, event):
-    #     if event.keysym == 'Up':
-    #         self.game.direction = Directions.Up
-    #     elif event.keysym == 'Down':
-    #         self.game.direction = Directions.Down
-    #     elif event.keysym == 'Left':
-    #         self.game.direction = Directions.Left
-    #     elif event.keysym == 'Right':
-    #         self.game.direction = Directions.Right
-    #
-    #     self.game.move(self.game.direction, self.game.current_board)
 
     def stop_game(self):
         self.game.gameMain.quit()

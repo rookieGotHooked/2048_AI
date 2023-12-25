@@ -4,30 +4,16 @@ import numpy as np
 from params import Directions, TARGET
 from game.game import Game
 
-# Sigmoid
-# NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.75, 'Left': 0.5, 'Right': 0.25}
-# DIRECTION_VALUES_LIST = [1.0, 0.75, 0.5, 0.25]
-# DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
-
-# Tanh
-# NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.5, 'Left': 0.0, 'Right': -0.5}
-# DIRECTION_VALUES_LIST = [1.0, 0.5, 0.0, -0.5]
-# DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
-
-# ReLU
-# NORMALIZED_DIR_DICT = {'Up': 10.0, 'Down': 7.5, 'Left': 5.0, 'Right': 2.5}
-# DIRECTION_VALUES_LIST = [10.0, 7.5, 5.0, 2.5]
-# DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
-
 
 class NeuralNetwork:
     """
     Represents a neural network
     """
 
-    def __init__(self, function="tanh"):
+    def __init__(self, function="tanh", alpha=0.01):
         self._layers = []
         self.function = function
+        self.alpha = alpha
 
         if function == "sigmoid":
             self.NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.75, 'Left': 0.5, 'Right': 0.25}
@@ -35,11 +21,11 @@ class NeuralNetwork:
             self.DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
 
         elif function == "tanh":
-            self.NORMALIZED_DIR_DICT = {'Up': 1.0, 'Down': 0.5, 'Left': 0.0, 'Right': -0.5}
-            self.DIRECTION_VALUES_LIST = [1.0, 0.5, 0.0, -0.5]
+            self.NORMALIZED_DIR_DICT = {'Up': -1.0, 'Down': -0.5, 'Left': 0.5, 'Right': 1.0}
+            self.DIRECTION_VALUES_LIST = [-1.0, -0.5, 0.5, 1.0]
             self.DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
 
-        else:
+        elif function == "leaky_relu" or "relu":
             self.NORMALIZED_DIR_DICT = {'Up': 10.0, 'Down': 7.5, 'Left': 5.0, 'Right': 2.5}
             self.DIRECTION_VALUES_LIST = [10.0, 7.5, 5.0, 2.5]
             self.DIRECTIONS_LIST = [Directions.Up, Directions.Down, Directions.Left, Directions.Right]
@@ -64,7 +50,11 @@ class NeuralNetwork:
         @rtype X: np.array
         """
         for layer in self._layers:
-            x = layer.activate(x, self.function)
+            if self.function == "leaky_relu" or "relu":
+                x = layer.activate(x, self.function, self.alpha)
+            else:
+                x = layer.activate(x, self.function)
+        # print(f"feed_forward x: {x}")
         return x
 
     def predict(self, x):
@@ -84,9 +74,9 @@ class NeuralNetwork:
         for index in np.nditer(direction_vector_choices):
             choices_to_return.append(self.DIRECTIONS_LIST[int(index)])
 
-        print('Result after predictions:')
-        for choice in choices_to_return:
-            print(choice.value)
+        # print('Result after predictions:')
+        # for choice in choices_to_return:
+        #     print(choice.value)
 
         return choices_to_return
 

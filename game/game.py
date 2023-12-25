@@ -31,13 +31,6 @@ class Game:
         if play:
             self.history.add_grid_state(self.to_string(), self.score)
 
-        #
-        # while not game_window.game.game_end:
-        #     x = np.array(np.mat(current_game.to_string()))
-        #     predictions = nn.predict(x)
-        #     current_game.play_many_directions(predictions)
-        # current_game.save_game(base_path=replay_dir)
-
     def update(self):
         self.draw_board()
         self.draw_pieces(self.current_board)
@@ -79,9 +72,6 @@ class Game:
         game_end = True
 
         return board, game_end
-
-    def is_winning(self):
-        return np.count_nonzero(self.current_board == TARGET) > 0
 
     def draw_pieces(self, board):
         for i in range(4):
