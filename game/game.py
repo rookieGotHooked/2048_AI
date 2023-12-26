@@ -4,7 +4,7 @@ from os import path
 import numpy as np
 import re
 import pygame
-from params import (GAME_VIEW_WIDTH, GAME_VIEW_HEIGHT, COLORS, FONT, BOARD_INIT_VALUES, Directions, States, TARGET)
+from params import (GAME_VIEW_WIDTH, GAME_VIEW_HEIGHT, COLORS, FONT, BOARD_INIT_VALUES, Directions, States)
 from PIL import ImageTk, Image
 from game.history import History
 import random
@@ -243,7 +243,6 @@ class Game:
             self.round_count += 1
             # self.grid.generate_new_number(self.grid.return_free_positions())
             self.history.add_grid_state(self.to_string(), self.score)
-            print(self.__repr__())
             return True
         else:
             return False

@@ -54,7 +54,6 @@ class NeuralNetwork:
                 x = layer.activate(x, self.function, self.alpha)
             else:
                 x = layer.activate(x, self.function)
-        # print(f"feed_forward x: {x}")
         return x
 
     def predict(self, x):
@@ -73,10 +72,6 @@ class NeuralNetwork:
         choices_to_return = list()
         for index in np.nditer(direction_vector_choices):
             choices_to_return.append(self.DIRECTIONS_LIST[int(index)])
-
-        # print('Result after predictions:')
-        # for choice in choices_to_return:
-        #     print(choice.value)
 
         return choices_to_return
 

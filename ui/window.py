@@ -19,7 +19,6 @@ class Window:
         self.window_after_id = None
 
         self.game = Game(True)
-        # self.window.bind('<KeyPress>', self.handle_key_press)
 
         self.score_label = tk.Label(self.window, text=f"Score: {self.game.score}", font=(TK_FONT, TK_FONT_SIZE, "bold"), padx=10)
         self.score_label.place(x=0, y=420)
@@ -59,7 +58,6 @@ class Window:
             self.game.play_many_directions(prediction)
             self.window_after_id = self.window.after(int(1000 / FPS), self.update)
         else:
-            print(f"\nGame ended")
             self.result_label.place(x=125, y=150)
             self.stop_game()
             self.game.save_game(base_path=self.replay_dir)
